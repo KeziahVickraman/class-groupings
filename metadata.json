@@ -1,0 +1,6 @@
+{
+  "name": "Class Seating & Group Guide",
+  "description": "Minimalist interactive classroom seating map and visual guide with hover-to-reveal group member names and roster views.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
