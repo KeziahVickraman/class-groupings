@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Save } from 'lucide-react';
 import { ClassGroup } from '../types';
 
@@ -15,13 +15,25 @@ export const EditGroupModal: React.FC<EditGroupModalProps> = ({
   onClose,
   onSave,
 }) => {
-  if (!isOpen || !group) return null;
+  const [name, setName] = useState('');
+  const [member0, setMember0] = useState('');
+  const [member1, setMember1] = useState('');
+  const [member2, setMember2] = useState('');
+  const [member3, setMember3] = useState('');
+  const [notes, setNotes] = useState('');
 
-  const [name, setName] = useState(group.name);
-  const [member0, setMember0] = useState(group.members[0] || '');
-  const [member1, setMember1] = useState(group.members[1] || '');
-  const [member2, setMember2] = useState(group.members[2] || '');
-  const [member3, setMember3] = useState(group.members[3] || '');
+  useEffect(() => {
+    if (group) {
+      setName(group.name || '');
+      setMember0(group.members[0] || '');
+      setMember1(group.members[1] || '');
+      setMember2(group.members[2] || '');
+      setMember3(group.members[3] || '');
+      setNotes(group.notes || '');
+    }
+  }, [group]);
+
+  if (!isOpen || !group) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +41,7 @@ export const EditGroupModal: React.FC<EditGroupModalProps> = ({
       ...group,
       name: name.trim() || group.name,
       members: [member0.trim(), member1.trim(), member2.trim(), member3.trim()].filter(Boolean),
+      notes: notes.trim() || undefined,
     });
     onClose();
   };
@@ -44,7 +57,7 @@ export const EditGroupModal: React.FC<EditGroupModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-700 rounded-lg"
+            className="p-1 text-slate-400 hover:text-slate-700 rounded-lg cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -99,17 +112,30 @@ export const EditGroupModal: React.FC<EditGroupModalProps> = ({
             />
           </div>
 
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1">
+              Notes (Optional)
+            </label>
+            <input
+              type="text"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="e.g. Anchor: Soh (advanced)"
+              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#125977]"
+            />
+          </div>
+
           <div className="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium"
+              className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-3 py-1.5 rounded-lg bg-[#125977] hover:bg-[#166688] text-white text-xs font-medium flex items-center gap-1"
+              className="px-3 py-1.5 rounded-lg bg-[#125977] hover:bg-[#166688] text-white text-xs font-medium flex items-center gap-1 cursor-pointer"
             >
               <Save className="w-3.5 h-3.5" />
               <span>Save</span>

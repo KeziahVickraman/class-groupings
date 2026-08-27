@@ -10,6 +10,8 @@ interface GroupTableProps {
   searchQuery: string;
   isSearchMatch: boolean;
   showNamesAlways?: boolean;
+  isFlipped?: boolean;
+  overrideRotation?: number;
 }
 
 export const GroupTable: React.FC<GroupTableProps> = ({
@@ -20,11 +22,22 @@ export const GroupTable: React.FC<GroupTableProps> = ({
   searchQuery,
   isSearchMatch,
   showNamesAlways = false,
+  isFlipped = false,
+  overrideRotation,
 }) => {
   const [isLocalHovered, setIsLocalHovered] = useState(false);
   const activeHover = isHovered || isLocalHovered;
 
-  const rotationAngle = group.tablePosition.rotationDeg;
+  const rotationAngle =
+    overrideRotation !== undefined
+      ? overrideRotation
+      : isFlipped
+      ? -group.tablePosition.rotationDeg
+      : group.tablePosition.rotationDeg;
+
+  const isTopRow = isFlipped
+    ? group.tablePosition.row === 2
+    : group.tablePosition.row === 1;
 
   const hasSearchFocus =
     isSearchMatch ||
@@ -111,11 +124,11 @@ export const GroupTable: React.FC<GroupTableProps> = ({
           className="absolute z-50 transition-all duration-150 pointer-events-none"
           style={{
             transform: `rotate(${-rotationAngle}deg)`,
-            ...(group.tablePosition.row === 1
+            ...(isTopRow
               ? { bottom: 'calc(100% + 16px)' }
               : { top: 'calc(100% + 16px)' }),
             left: '50%',
-            transformOrigin: group.tablePosition.row === 1 ? 'bottom center' : 'top center',
+            transformOrigin: isTopRow ? 'bottom center' : 'top center',
             marginLeft: '-128px', // center 256px width tooltip
           }}
         >

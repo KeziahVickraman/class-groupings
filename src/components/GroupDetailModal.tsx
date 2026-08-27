@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Copy, Check, Edit2 } from 'lucide-react';
+import { X, Copy, Check, Edit2, Info } from 'lucide-react';
 import { ClassGroup } from '../types';
 
 interface GroupDetailModalProps {
@@ -18,7 +18,9 @@ export const GroupDetailModal: React.FC<GroupDetailModalProps> = ({
   if (!group) return null;
 
   const handleCopy = () => {
-    const text = `${group.name}\n${group.members.map((m) => `• ${m}`).join('\n')}`;
+    const text = `${group.name}\n${group.members.map((m) => `• ${m}`).join('\n')}${
+      group.notes ? `\nNotes: ${group.notes}` : ''
+    }`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -43,14 +45,14 @@ export const GroupDetailModal: React.FC<GroupDetailModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-700 rounded-lg"
+            className="p-1 text-slate-400 hover:text-slate-700 rounded-lg cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-5 space-y-3">
+        <div className="p-5 space-y-3.5">
           <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
             Group Members ({group.members.length})
           </div>
@@ -67,6 +69,16 @@ export const GroupDetailModal: React.FC<GroupDetailModalProps> = ({
               </div>
             ))}
           </div>
+
+          {group.notes && (
+            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-start gap-2">
+              <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-semibold text-slate-700">Notes: </span>
+                <span>{group.notes}</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Footer */}
@@ -74,7 +86,7 @@ export const GroupDetailModal: React.FC<GroupDetailModalProps> = ({
           <button
             type="button"
             onClick={handleCopy}
-            className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-medium flex items-center gap-1.5 transition-colors"
+            className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             {copied ? (
               <>
@@ -95,7 +107,7 @@ export const GroupDetailModal: React.FC<GroupDetailModalProps> = ({
               onClose();
               onEdit(group);
             }}
-            className="px-3 py-1.5 rounded-lg bg-[#125977] hover:bg-[#166688] text-white text-xs font-medium flex items-center gap-1.5 transition-colors"
+            className="px-3 py-1.5 rounded-lg bg-[#125977] hover:bg-[#166688] text-white text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <Edit2 className="w-3 h-3" />
             <span>Edit</span>

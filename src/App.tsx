@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { INITIAL_SESSION } from './data/initialData';
+import { INITIAL_SESSIONS } from './data/initialData';
 import { ClassGroup, SessionData } from './types';
 import { Header } from './components/Header';
 import { ClassroomMap } from './components/ClassroomMap';
@@ -8,21 +8,33 @@ import { GroupDetailModal } from './components/GroupDetailModal';
 import { EditGroupModal } from './components/EditGroupModal';
 import { RotateCcw } from 'lucide-react';
 
-const STORAGE_KEY = 'class_seating_guide_v2';
+const STORAGE_KEY = 'class_seating_guide_v5';
 
 export default function App() {
-  const [session, setSession] = useState<SessionData>(() => {
+  const [sessions, setSessions] = useState<SessionData[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length >= 2) {
+          // Normalize groups to ensure clean names and no anchor notes
+          return parsed.map((s: SessionData) => ({
+            ...s,
+            groups: s.groups.map((g: ClassGroup) => ({
+              ...g,
+              name: g.name.replace(/^NG(\d+)/i, 'Group $1'),
+              notes: undefined,
+            })),
+          }));
+        }
       }
     } catch {
       // ignore
     }
-    return INITIAL_SESSION;
+    return INITIAL_SESSIONS;
   });
 
+  const [activeSessionId, setActiveSessionId] = useState<string>('day-1');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [hoveredGroupId, setHoveredGroupId] = useState<number | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<ClassGroup | null>(null);
@@ -30,45 +42,61 @@ export default function App() {
   const [showNamesAlways, setShowNamesAlways] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<'map' | 'table'>('map');
 
+  const currentSession =
+    sessions.find((s) => s.id === activeSessionId) || sessions[0];
+
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
     } catch {
       // ignore
     }
-  }, [session]);
+  }, [sessions]);
 
   const handleUpdateTitle = (newTitle: string) => {
-    setSession((prev) => ({ ...prev, title: newTitle }));
+    setSessions((prev) =>
+      prev.map((s) => (s.id === currentSession.id ? { ...s, title: newTitle } : s))
+    );
   };
 
   const handleSaveGroup = (updatedGroup: ClassGroup) => {
-    setSession((prev) => ({
-      ...prev,
-      groups: prev.groups.map((g) => (g.id === updatedGroup.id ? updatedGroup : g)),
-    }));
+    setSessions((prev) =>
+      prev.map((s) => {
+        if (s.id !== currentSession.id) return s;
+        return {
+          ...s,
+          groups: s.groups.map((g) => (g.id === updatedGroup.id ? updatedGroup : g)),
+        };
+      })
+    );
     if (selectedGroup && selectedGroup.id === updatedGroup.id) {
       setSelectedGroup(updatedGroup);
     }
   };
 
   const handleResetData = () => {
-    if (window.confirm('Reset to original group seating?')) {
-      setSession(INITIAL_SESSION);
+    if (window.confirm('Reset both Day 1 and Day 2 to original default groupings?')) {
+      setSessions(INITIAL_SESSIONS);
       localStorage.removeItem(STORAGE_KEY);
     }
   };
 
-  const totalStudents = session.groups.reduce(
+  const totalStudents = currentSession.groups.reduce(
     (sum, g) => sum + (g.members?.length || 0),
     0
   );
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-['Plus_Jakarta_Sans',sans-serif] flex flex-col selection:bg-[#125977] selection:text-white">
-      {/* Minimalist Top Header */}
+      {/* Minimalist Top Header with Day Switcher */}
       <Header
-        title={session.title}
+        sessions={sessions}
+        activeSessionId={activeSessionId}
+        onSelectSession={(id) => {
+          setActiveSessionId(id);
+          setSelectedGroup(null);
+        }}
+        title={currentSession.title}
         onTitleChange={handleUpdateTitle}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -85,12 +113,12 @@ export default function App() {
         {searchQuery && (
           <div className="bg-white border border-slate-200 rounded-lg px-4 py-2 flex items-center justify-between text-xs text-slate-600 shadow-xs">
             <span>
-              Showing results for: <strong className="text-slate-900 font-semibold">"{searchQuery}"</strong>
+              Showing results for: <strong className="text-slate-900 font-semibold">"{searchQuery}"</strong> in {currentSession.title}
             </span>
             <button
               type="button"
               onClick={() => setSearchQuery('')}
-              className="text-slate-500 hover:text-slate-900 font-medium"
+              className="text-slate-500 hover:text-slate-900 font-medium cursor-pointer"
             >
               Clear
             </button>
@@ -100,7 +128,7 @@ export default function App() {
         {/* View Mode: Interactive Classroom Map */}
         {viewMode === 'map' ? (
           <ClassroomMap
-            groups={session.groups}
+            groups={currentSession.groups}
             onSelectGroup={(group) => setSelectedGroup(group)}
             hoveredGroupId={hoveredGroupId}
             setHoveredGroupId={setHoveredGroupId}
@@ -109,8 +137,8 @@ export default function App() {
           />
         ) : (
           <RosterTableView
-            groups={session.groups}
-            title={session.title}
+            groups={currentSession.groups}
+            title={currentSession.title}
             searchQuery={searchQuery}
             onSelectGroup={(group) => setSelectedGroup(group)}
           />
@@ -122,10 +150,10 @@ export default function App() {
           <button
             type="button"
             onClick={handleResetData}
-            className="hover:text-slate-700 flex items-center gap-1 transition-colors"
+            className="hover:text-slate-700 flex items-center gap-1 transition-colors cursor-pointer"
           >
             <RotateCcw className="w-3 h-3" />
-            <span>Reset Roster</span>
+            <span>Reset Rosters</span>
           </button>
         </footer>
       </main>

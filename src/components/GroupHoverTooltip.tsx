@@ -28,7 +28,7 @@ export const GroupHoverTooltip: React.FC<GroupHoverTooltipProps> = ({
   return (
     <div
       id={`hover-tooltip-${group.id}`}
-      className="w-64 bg-white/95 backdrop-blur-sm text-slate-800 rounded-xl shadow-xl border border-slate-200 p-3 pointer-events-none transition-all duration-150 z-50 text-left"
+      className="w-68 bg-white/98 backdrop-blur-sm text-slate-800 rounded-xl shadow-2xl border border-slate-200 p-3.5 pointer-events-none transition-all duration-150 z-50 text-left"
     >
       <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
         <span className="font-bold text-slate-900 text-sm tracking-tight">
@@ -50,6 +50,13 @@ export const GroupHoverTooltip: React.FC<GroupHoverTooltipProps> = ({
           </div>
         ))}
       </div>
+
+      {group.notes && (
+        <div className="mt-2.5 pt-2 border-t border-slate-100 text-[11px] text-slate-500 font-medium flex items-center gap-1.5 bg-slate-50/80 px-2 py-1 rounded">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+          <span className="truncate">{group.notes}</span>
+        </div>
+      )}
     </div>
   );
 };

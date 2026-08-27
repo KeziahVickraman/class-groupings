@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Copy, Check, Download } from 'lucide-react';
+import { Copy, Check, Download, Info } from 'lucide-react';
 import { ClassGroup } from '../types';
 
 interface RosterTableViewProps {
@@ -32,10 +32,12 @@ export const RosterTableView: React.FC<RosterTableViewProps> = ({
     );
   };
 
+  const hasAnyNotes = groups.some((g) => !!g.notes);
+
   const handleCopyAll = () => {
-    let csv = `Group\tMember 1\tMember 2\tMember 3\tMember 4\n`;
+    let csv = `Group\tMember 1\tMember 2\tMember 3\tMember 4\tNotes\n`;
     groups.forEach((g) => {
-      csv += `${g.name}\t${g.members.join('\t')}\n`;
+      csv += `${g.name}\t${g.members.join('\t')}\t${g.notes || ''}\n`;
     });
     navigator.clipboard.writeText(csv);
     setCopied(true);
@@ -43,10 +45,10 @@ export const RosterTableView: React.FC<RosterTableViewProps> = ({
   };
 
   const handleDownloadCSV = () => {
-    let csv = `Group,Member\n`;
+    let csv = `Group,Member,Notes\n`;
     groups.forEach((g) => {
       g.members.forEach((m) => {
-        csv += `"${g.name}","${m}"\n`;
+        csv += `"${g.name}","${m}","${g.notes || ''}"\n`;
       });
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -80,7 +82,7 @@ export const RosterTableView: React.FC<RosterTableViewProps> = ({
           <button
             type="button"
             onClick={handleCopyAll}
-            className="px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-medium text-slate-700 flex items-center gap-1.5 transition-colors"
+            className="px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-medium text-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             {copied ? (
               <>
@@ -98,7 +100,7 @@ export const RosterTableView: React.FC<RosterTableViewProps> = ({
           <button
             type="button"
             onClick={handleDownloadCSV}
-            className="px-3 py-1.5 rounded-lg bg-[#125977] hover:bg-[#166688] text-xs font-medium text-white flex items-center gap-1.5 transition-colors"
+            className="px-3 py-1.5 rounded-lg bg-[#125977] hover:bg-[#166688] text-xs font-medium text-white flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
             <span>CSV</span>
@@ -119,7 +121,14 @@ export const RosterTableView: React.FC<RosterTableViewProps> = ({
                   onClick={() => onSelectGroup(group)}
                   className="p-3 border-r border-slate-200 font-bold text-center text-slate-900 hover:bg-slate-100 cursor-pointer transition-colors"
                 >
-                  {group.name}
+                  <div className="flex flex-col items-center">
+                    <span>{group.name}</span>
+                    {group.notes && (
+                      <span className="text-[10px] font-normal text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.2 mt-0.5 max-w-[120px] truncate" title={group.notes}>
+                        {group.notes}
+                      </span>
+                    )}
+                  </div>
                 </th>
               ))}
             </tr>
@@ -149,6 +158,31 @@ export const RosterTableView: React.FC<RosterTableViewProps> = ({
                 })}
               </tr>
             ))}
+
+            {/* Notes row if any notes exist */}
+            {hasAnyNotes && (
+              <tr className="bg-amber-50/40 border-t border-slate-200">
+                <td className="p-3 border-r border-slate-200 text-amber-800 font-semibold text-center text-[10px] uppercase">
+                  Notes
+                </td>
+                {groups.map((group) => (
+                  <td
+                    key={group.id}
+                    className="p-2.5 border-r border-slate-200 text-center text-[11px] text-amber-900 font-medium"
+                    onClick={() => onSelectGroup(group)}
+                  >
+                    {group.notes ? (
+                      <div className="flex items-center justify-center gap-1">
+                        <Info className="w-3 h-3 text-amber-600 shrink-0" />
+                        <span className="truncate">{group.notes}</span>
+                      </div>
+                    ) : (
+                      '—'
+                    )}
+                  </td>
+                ))}
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

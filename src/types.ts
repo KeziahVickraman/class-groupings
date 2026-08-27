@@ -2,6 +2,7 @@ export interface ClassGroup {
   id: number;
   name: string;
   members: string[];
+  notes?: string;
   tablePosition: {
     column: 'left' | 'center-left' | 'center-right' | 'right';
     row: 1 | 2;
@@ -10,6 +11,7 @@ export interface ClassGroup {
 }
 
 export interface SessionData {
+  id: string;
   title: string;
   groups: ClassGroup[];
 }
