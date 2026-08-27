@@ -65,7 +65,9 @@ export const GroupTable: React.FC<GroupTableProps> = ({
         id={`group-table-btn-${group.id}`}
         type="button"
         onClick={() => onClick(group)}
-        className={`relative w-56 md:w-64 lg:w-72 h-16 md:h-18 rounded-sm border-2 transition-all duration-150 cursor-pointer flex flex-col items-center justify-center p-2 shadow-md focus:outline-none ${
+        className={`relative w-60 sm:w-68 md:w-76 rounded-md border-2 transition-all duration-200 cursor-pointer flex flex-col items-center justify-center p-3 shadow-md focus:outline-none ${
+          showNamesAlways ? 'min-h-[116px]' : 'h-16 md:h-18'
+        } ${
           hasSearchFocus
             ? 'bg-[#156d91] border-amber-400 ring-2 ring-amber-300'
             : activeHover
@@ -73,18 +75,32 @@ export const GroupTable: React.FC<GroupTableProps> = ({
             : 'bg-[#125977] border-[#093547] hover:bg-[#166688]'
         }`}
       >
-        <span className="text-base md:text-lg font-semibold tracking-wide text-white">
+        <span className="text-base md:text-lg font-bold tracking-wide text-white drop-shadow-xs">
           {group.name}
         </span>
 
-        {/* If Always Show Names is toggled on, show compact list */}
+        {/* When Always Show Names is toggled on: clean, crystal clear 2x2 grid of names */}
         {showNamesAlways && (
-          <div className="w-full mt-1 pt-1 border-t border-white/20 grid grid-cols-2 gap-x-2 text-[10px] text-teal-100 truncate">
-            {group.members.slice(0, 4).map((m, i) => (
-              <span key={i} className="truncate">
-                {m.split(' ')[0]} {m.split(' ')[1] || ''}
-              </span>
-            ))}
+          <div className="w-full mt-2 pt-2 border-t border-white/25 grid grid-cols-2 gap-1.5 text-left">
+            {group.members.map((member, idx) => {
+              const isMatch =
+                searchQuery.trim() !== '' &&
+                member.toLowerCase().includes(searchQuery.toLowerCase());
+              return (
+                <div
+                  key={idx}
+                  className={`px-1.5 py-1 rounded bg-black/15 text-[11px] leading-tight font-medium text-white truncate flex items-center gap-1 border ${
+                    isMatch
+                      ? 'border-amber-300 bg-amber-400 text-slate-900 font-bold'
+                      : 'border-white/10 text-teal-50'
+                  }`}
+                  title={member}
+                >
+                  <span className={`w-1 h-1 rounded-full shrink-0 ${isMatch ? 'bg-slate-900' : 'bg-teal-300'}`} />
+                  <span className="truncate">{member}</span>
+                </div>
+              );
+            })}
           </div>
         )}
       </button>

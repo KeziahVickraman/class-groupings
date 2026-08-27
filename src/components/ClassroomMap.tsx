@@ -88,19 +88,23 @@ export const ClassroomMap: React.FC<ClassroomMapProps> = ({
       </div>
 
       {/* Main Floor Canvas */}
-      <div className="w-full overflow-x-auto overflow-y-visible p-8 md:p-12 flex justify-center items-center min-h-[660px] select-none bg-white">
+      <div className={`w-full overflow-x-auto overflow-y-visible p-8 md:p-12 flex justify-center items-center select-none bg-white transition-all duration-200 ${
+        showNamesAlways ? 'min-h-[740px]' : 'min-h-[660px]'
+      }`}>
         <div
           id="classroom-floor-stage"
           style={{
             transform: `scale(${zoomLevel})`,
             transformOrigin: 'top center',
             transition: 'transform 0.2s ease-out',
-            minWidth: '1120px',
+            minWidth: showNamesAlways ? '1180px' : '1120px',
           }}
-          className="relative flex flex-col items-center justify-start w-full max-w-[1200px] py-6"
+          className="relative flex flex-col items-center justify-start w-full max-w-[1250px] py-6"
         >
           {/* PODIUM DESK (Exact replica of Image 1) */}
-          <div className="relative mb-24 flex flex-col items-center">
+          <div className={`relative flex flex-col items-center transition-all duration-200 ${
+            showNamesAlways ? 'mb-20' : 'mb-24'
+          }`}>
             <div
               id="podium-desk"
               className="w-56 h-16 rounded-sm bg-[#125977] border-2 border-[#093547] text-white flex items-center justify-center shadow-md"
@@ -112,9 +116,11 @@ export const ClassroomMap: React.FC<ClassroomMapProps> = ({
           </div>
 
           {/* TABLE SEATING ARRANGEMENT (Exact replica of Image 1 with generous spacing) */}
-          <div className="w-full flex items-start justify-center gap-12 md:gap-16 relative px-4">
+          <div className="w-full flex items-start justify-center gap-10 md:gap-14 lg:gap-16 relative px-4">
             {/* LEFT COLUMN: Group 1 (upper) & Group 2 (lower) - angled ~14deg */}
-            <div className="flex flex-col gap-20 items-center pt-2">
+            <div className={`flex flex-col items-center pt-2 transition-all duration-200 ${
+              showNamesAlways ? 'gap-16 md:gap-20' : 'gap-20'
+            }`}>
               {group1 && (
                 <GroupTable
                   group={group1}
@@ -140,9 +146,11 @@ export const ClassroomMap: React.FC<ClassroomMapProps> = ({
             </div>
 
             {/* CENTER COLUMNS: Group 3 & Group 5 (Row 1), Group 4 & Group 6 (Row 2) */}
-            <div className="flex flex-col gap-20 items-center justify-center">
+            <div className={`flex flex-col items-center justify-center transition-all duration-200 ${
+              showNamesAlways ? 'gap-16 md:gap-20' : 'gap-20'
+            }`}>
               {/* Row 1: Group 3 and Group 5 */}
-              <div className="flex gap-8 md:gap-10 items-center">
+              <div className="flex gap-6 md:gap-8 lg:gap-10 items-center">
                 {group3 && (
                   <GroupTable
                     group={group3}
@@ -168,7 +176,7 @@ export const ClassroomMap: React.FC<ClassroomMapProps> = ({
               </div>
 
               {/* Row 2: Group 4 and Group 6 */}
-              <div className="flex gap-8 md:gap-10 items-center">
+              <div className="flex gap-6 md:gap-8 lg:gap-10 items-center">
                 {group4 && (
                   <GroupTable
                     group={group4}
@@ -195,7 +203,9 @@ export const ClassroomMap: React.FC<ClassroomMapProps> = ({
             </div>
 
             {/* RIGHT COLUMN: Group 7 (upper) & Group 8 (lower) - angled ~ -14deg */}
-            <div className="flex flex-col gap-20 items-center pt-2">
+            <div className={`flex flex-col items-center pt-2 transition-all duration-200 ${
+              showNamesAlways ? 'gap-16 md:gap-20' : 'gap-20'
+            }`}>
               {group7 && (
                 <GroupTable
                   group={group7}
