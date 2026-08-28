@@ -8,7 +8,7 @@ import { GroupDetailModal } from './components/GroupDetailModal';
 import { EditGroupModal } from './components/EditGroupModal';
 import { RotateCcw } from 'lucide-react';
 
-const STORAGE_KEY = 'class_seating_guide_v5';
+const STORAGE_KEY = 'class_seating_guide_v6';
 
 export default function App() {
   const [sessions, setSessions] = useState<SessionData[]>(() => {
@@ -16,7 +16,7 @@ export default function App() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length >= 2) {
+        if (Array.isArray(parsed) && parsed.length >= 3) {
           // Normalize groups to ensure clean names and no anchor notes
           return parsed.map((s: SessionData) => ({
             ...s,
@@ -75,7 +75,7 @@ export default function App() {
   };
 
   const handleResetData = () => {
-    if (window.confirm('Reset both Day 1 and Day 2 to original default groupings?')) {
+    if (window.confirm('Reset all session groupings (Day 1, Day 2 Part A, Day 2) to original defaults?')) {
       setSessions(INITIAL_SESSIONS);
       localStorage.removeItem(STORAGE_KEY);
     }

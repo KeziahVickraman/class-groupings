@@ -37,10 +37,32 @@ export const EditGroupModal: React.FC<EditGroupModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const updatedMembers = [
+      member0.trim(),
+      member1.trim(),
+      member2.trim(),
+      member3.trim(),
+    ].filter(Boolean);
+
+    let updatedSubTeams = group.subTeams;
+    if (group.subTeams && group.subTeams.length === 2) {
+      updatedSubTeams = [
+        {
+          name: group.subTeams[0].name || 'Team 1',
+          members: [member0.trim(), member1.trim()].filter(Boolean),
+        },
+        {
+          name: group.subTeams[1].name || 'Team 2',
+          members: [member2.trim(), member3.trim()].filter(Boolean),
+        },
+      ];
+    }
+
     onSave({
       ...group,
       name: name.trim() || group.name,
-      members: [member0.trim(), member1.trim(), member2.trim(), member3.trim()].filter(Boolean),
+      members: updatedMembers,
+      subTeams: updatedSubTeams,
       notes: notes.trim() || undefined,
     });
     onClose();

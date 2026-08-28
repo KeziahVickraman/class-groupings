@@ -18,9 +18,20 @@ export const GroupDetailModal: React.FC<GroupDetailModalProps> = ({
   if (!group) return null;
 
   const handleCopy = () => {
-    const text = `${group.name}\n${group.members.map((m) => `• ${m}`).join('\n')}${
-      group.notes ? `\nNotes: ${group.notes}` : ''
-    }`;
+    let text = `${group.name}\n`;
+    if (group.subTeams && group.subTeams.length > 0) {
+      group.subTeams.forEach((sub, sIdx) => {
+        text += `${sub.name} (Pair ${sIdx + 1}):\n`;
+        sub.members.forEach((m) => {
+          text += `  • ${m}\n`;
+        });
+      });
+    } else {
+      text += group.members.map((m) => `• ${m}`).join('\n');
+    }
+    if (group.notes) {
+      text += `\nNotes: ${group.notes}`;
+    }
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -56,19 +67,49 @@ export const GroupDetailModal: React.FC<GroupDetailModalProps> = ({
           <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
             Group Members ({group.members.length})
           </div>
-          <div className="space-y-1.5">
-            {group.members.map((member, idx) => (
-              <div
-                key={idx}
-                className="flex items-center gap-2.5 p-2.5 rounded-lg bg-slate-50 border border-slate-100 text-slate-800 text-xs font-medium"
-              >
-                <span className="w-5 h-5 rounded bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">
-                  {idx + 1}
-                </span>
-                <span className="truncate">{member}</span>
-              </div>
-            ))}
-          </div>
+
+          {group.subTeams && group.subTeams.length > 0 ? (
+            <div className="space-y-3">
+              {group.subTeams.map((sub, sIdx) => (
+                <div key={sIdx} className="space-y-1.5 p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                  <div className="flex items-center justify-between text-[11px] font-bold text-slate-700">
+                    <span className="flex items-center gap-1.5">
+                      <span className={`w-2 h-2 rounded-full ${sIdx === 0 ? 'bg-[#125977]' : 'bg-teal-600'}`} />
+                      {sub.name}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium">Pair {sIdx + 1}</span>
+                  </div>
+                  <div className="space-y-1 pt-0.5">
+                    {sub.members.map((member, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 p-1.5 rounded-md bg-white border border-slate-100 text-slate-800 text-xs font-medium"
+                      >
+                        <span className="w-4 h-4 rounded bg-slate-100 text-slate-500 flex items-center justify-center text-[10px] font-bold">
+                          {idx + 1}
+                        </span>
+                        <span className="truncate">{member}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              {group.members.map((member, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center gap-2.5 p-2.5 rounded-lg bg-slate-50 border border-slate-100 text-slate-800 text-xs font-medium"
+                >
+                  <span className="w-5 h-5 rounded bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">
+                    {idx + 1}
+                  </span>
+                  <span className="truncate">{member}</span>
+                </div>
+              ))}
+            </div>
+          )}
 
           {group.notes && (
             <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-start gap-2">

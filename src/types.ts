@@ -1,7 +1,13 @@
+export interface SubTeam {
+  name: string;
+  members: string[];
+}
+
 export interface ClassGroup {
   id: number;
   name: string;
   members: string[];
+  subTeams?: SubTeam[];
   notes?: string;
   tablePosition: {
     column: 'left' | 'center-left' | 'center-right' | 'right';

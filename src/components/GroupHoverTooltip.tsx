@@ -39,17 +39,41 @@ export const GroupHoverTooltip: React.FC<GroupHoverTooltipProps> = ({
         </span>
       </div>
 
-      <div className="space-y-1">
-        {group.members.map((member, idx) => (
-          <div
-            key={idx}
-            className="flex items-center gap-2 py-1 px-2 rounded-md bg-slate-50 text-slate-700 text-xs font-medium"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#125977]" />
-            <span className="truncate">{highlightText(member)}</span>
-          </div>
-        ))}
-      </div>
+      {group.subTeams && group.subTeams.length > 0 ? (
+        <div className="space-y-2">
+          {group.subTeams.map((sub, sIdx) => (
+            <div key={sIdx} className="space-y-1">
+              <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-wider px-0.5">
+                <span className="flex items-center gap-1.5">
+                  <span className={`w-1.5 h-1.5 rounded-full ${sIdx === 0 ? 'bg-[#125977]' : 'bg-teal-600'}`} />
+                  {sub.name}
+                </span>
+                <span className="text-[9px] font-medium text-slate-400">Pair {sIdx + 1}</span>
+              </div>
+              {sub.members.map((member, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center gap-2 py-1 px-2 rounded-md bg-slate-50 text-slate-700 text-xs font-medium"
+                >
+                  <span className="truncate">{highlightText(member)}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-1">
+          {group.members.map((member, idx) => (
+            <div
+              key={idx}
+              className="flex items-center gap-2 py-1 px-2 rounded-md bg-slate-50 text-slate-700 text-xs font-medium"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#125977]" />
+              <span className="truncate">{highlightText(member)}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {group.notes && (
         <div className="mt-2.5 pt-2 border-t border-slate-100 text-[11px] text-slate-500 font-medium flex items-center gap-1.5 bg-slate-50/80 px-2 py-1 rounded">

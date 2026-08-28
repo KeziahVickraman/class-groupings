@@ -79,7 +79,11 @@ export const GroupTable: React.FC<GroupTableProps> = ({
         type="button"
         onClick={() => onClick(group)}
         className={`relative w-60 sm:w-68 md:w-76 rounded-md border-2 transition-all duration-200 cursor-pointer flex flex-col items-center justify-center p-3 shadow-md focus:outline-none ${
-          showNamesAlways ? 'min-h-[116px]' : 'h-16 md:h-18'
+          showNamesAlways
+            ? group.subTeams && group.subTeams.length > 0
+              ? 'min-h-[136px]'
+              : 'min-h-[116px]'
+            : 'h-16 md:h-18'
         } ${
           hasSearchFocus
             ? 'bg-[#156d91] border-amber-400 ring-2 ring-amber-300'
@@ -92,30 +96,72 @@ export const GroupTable: React.FC<GroupTableProps> = ({
           {group.name}
         </span>
 
-        {/* When Always Show Names is toggled on: clean, crystal clear 2x2 grid of names */}
-        {showNamesAlways && (
-          <div className="w-full mt-2 pt-2 border-t border-white/25 grid grid-cols-2 gap-1.5 text-left">
-            {group.members.map((member, idx) => {
-              const isMatch =
-                searchQuery.trim() !== '' &&
-                member.toLowerCase().includes(searchQuery.toLowerCase());
-              return (
-                <div
-                  key={idx}
-                  className={`px-1.5 py-1 rounded bg-black/15 text-[11px] leading-tight font-medium text-white truncate flex items-center gap-1 border ${
-                    isMatch
-                      ? 'border-amber-300 bg-amber-400 text-slate-900 font-bold'
-                      : 'border-white/10 text-teal-50'
-                  }`}
-                  title={member}
-                >
-                  <span className={`w-1 h-1 rounded-full shrink-0 ${isMatch ? 'bg-slate-900' : 'bg-teal-300'}`} />
-                  <span className="truncate">{member}</span>
+        {/* When Always Show Names is toggled on: clean, crystal clear grid of names */}
+        {showNamesAlways &&
+          (group.subTeams && group.subTeams.length > 0 ? (
+            <div className="w-full mt-2 pt-1.5 border-t border-white/25 flex flex-col gap-1.5 text-left">
+              {group.subTeams.map((sub, sIdx) => (
+                <div key={sIdx} className="space-y-0.5">
+                  <div className="text-[9px] font-bold uppercase tracking-wider text-teal-200 px-0.5 flex items-center justify-between">
+                    <span>
+                      {sub.name} (Pair {sIdx + 1})
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-1">
+                    {sub.members.map((member, idx) => {
+                      const isMatch =
+                        searchQuery.trim() !== '' &&
+                        member.toLowerCase().includes(searchQuery.toLowerCase());
+                      return (
+                        <div
+                          key={idx}
+                          className={`px-1.5 py-0.5 rounded bg-black/15 text-[10.5px] leading-tight font-medium text-white truncate flex items-center gap-1 border ${
+                            isMatch
+                              ? 'border-amber-300 bg-amber-400 text-slate-900 font-bold'
+                              : 'border-white/10 text-teal-50'
+                          }`}
+                          title={member}
+                        >
+                          <span
+                            className={`w-1 h-1 rounded-full shrink-0 ${
+                              isMatch ? 'bg-slate-900' : 'bg-teal-300'
+                            }`}
+                          />
+                          <span className="truncate">{member}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
+              ))}
+            </div>
+          ) : (
+            <div className="w-full mt-2 pt-2 border-t border-white/25 grid grid-cols-2 gap-1.5 text-left">
+              {group.members.map((member, idx) => {
+                const isMatch =
+                  searchQuery.trim() !== '' &&
+                  member.toLowerCase().includes(searchQuery.toLowerCase());
+                return (
+                  <div
+                    key={idx}
+                    className={`px-1.5 py-1 rounded bg-black/15 text-[11px] leading-tight font-medium text-white truncate flex items-center gap-1 border ${
+                      isMatch
+                        ? 'border-amber-300 bg-amber-400 text-slate-900 font-bold'
+                        : 'border-white/10 text-teal-50'
+                    }`}
+                    title={member}
+                  >
+                    <span
+                      className={`w-1 h-1 rounded-full shrink-0 ${
+                        isMatch ? 'bg-slate-900' : 'bg-teal-300'
+                      }`}
+                    />
+                    <span className="truncate">{member}</span>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
       </button>
 
       {/* Floating Hover Tooltip - counter-rotated so it is always level and upright */}
